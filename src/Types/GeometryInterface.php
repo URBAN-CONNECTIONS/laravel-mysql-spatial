@@ -2,7 +2,7 @@
 
 namespace Grimzy\LaravelMysqlSpatial\Types;
 
-interface GeometryInterface
+interface GeometryInterface extends \JsonSerializable
 {
     public function toWKT();
 

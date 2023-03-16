@@ -20,7 +20,7 @@ class Polygon extends MultiLineString
         }
 
         if (!is_a($geoJson, GeoJsonPolygon::class)) {
-            throw new InvalidGeoJsonException('Expected '.GeoJsonPolygon::class.', got '.get_class($geoJson));
+            throw new InvalidGeoJsonException('Expected ' . GeoJsonPolygon::class . ', got ' . get_class($geoJson));
         }
 
         $set = [];
@@ -40,6 +40,7 @@ class Polygon extends MultiLineString
      *
      * @return \GeoJson\Geometry\Polygon
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $linearRings = [];

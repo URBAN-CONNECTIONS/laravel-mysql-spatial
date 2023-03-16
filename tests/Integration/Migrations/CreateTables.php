@@ -14,9 +14,7 @@ class CreateLocationTable extends Migration
     public function up()
     {
         Schema::create('geometry', function (Blueprint $table) {
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-            $table->increments('id');
+            $table->id();
             $table->geometry('geo')->default(null)->nullable();
             $table->point('location');  // required to be not null in order to add an index
             $table->lineString('line')->default(null)->nullable();
@@ -29,14 +27,12 @@ class CreateLocationTable extends Migration
         });
 
         Schema::create('no_spatial_fields', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->geometry('geometry')->default(null)->nullable();
         });
 
         Schema::create('with_srid', function (Blueprint $table) {
-            $table->charset = 'utf8mb4';
-            $table->collation = 'utf8mb4_unicode_ci';
-            $table->increments('id');
+            $table->id();
             $table->geometry('geo', 3857)->default(null)->nullable();
             $table->point('location', 3857)->default(null)->nullable();
             $table->lineString('line', 3857)->default(null)->nullable();

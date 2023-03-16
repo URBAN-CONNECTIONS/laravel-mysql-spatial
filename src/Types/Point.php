@@ -42,7 +42,7 @@ class Point extends Geometry
 
     public function toPair()
     {
-        return $this->getLng().' '.$this->getLat();
+        return $this->getLng() . ' ' . $this->getLat();
     }
 
     public static function fromPair($pair, $srid = 0)
@@ -64,7 +64,7 @@ class Point extends Geometry
 
     public function __toString()
     {
-        return $this->getLng().' '.$this->getLat();
+        return $this->getLng() . ' ' . $this->getLat();
     }
 
     /**
@@ -79,7 +79,7 @@ class Point extends Geometry
         }
 
         if (!is_a($geoJson, GeoJsonPoint::class)) {
-            throw new InvalidGeoJsonException('Expected '.GeoJsonPoint::class.', got '.get_class($geoJson));
+            throw new InvalidGeoJsonException('Expected ' . GeoJsonPoint::class . ', got ' . get_class($geoJson));
         }
 
         $coordinates = $geoJson->getCoordinates();
@@ -92,6 +92,7 @@ class Point extends Geometry
      *
      * @return \GeoJson\Geometry\Point
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return new GeoJsonPoint([$this->getLng(), $this->getLat()]);

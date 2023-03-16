@@ -23,10 +23,10 @@
         "jmikola/geojson": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.5",
-        "laravel/laravel": "^8.0",
-        "doctrine/dbal": "^2.5",
-        "laravel/browser-kit-testing": "^2.0",
+        "phpunit/phpunit": "^10.0",
+        "laravel/laravel": "^9.0|^10.0",
+        "doctrine/dbal": "^3.6",
+        "laravel/browser-kit-testing": "^7.0",
         "mockery/mockery": "^1.3"
     },
     "autoload": {
@@ -34,8 +34,8 @@
             "Grimzy\\LaravelMysqlSpatial\\": "src/"
         }
     },
-    "autoload-dev" : {
-        "classmap" : [
+    "autoload-dev": {
+        "classmap": [
             "tests/Unit",
             "tests/Integration"
         ]

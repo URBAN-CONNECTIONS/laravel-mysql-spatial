@@ -53,7 +53,7 @@ class MultiPoint extends PointCollection
         }
 
         if (!is_a($geoJson, GeoJsonMultiPoint::class)) {
-            throw new InvalidGeoJsonException('Expected '.GeoJsonMultiPoint::class.', got '.get_class($geoJson));
+            throw new InvalidGeoJsonException('Expected ' . GeoJsonMultiPoint::class . ', got ' . get_class($geoJson));
         }
 
         $set = [];
@@ -69,6 +69,7 @@ class MultiPoint extends PointCollection
      *
      * @return \GeoJson\Geometry\MultiPoint
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $points = [];
