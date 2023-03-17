@@ -15,19 +15,19 @@ class MultiPoint extends PointCollection
      */
     protected $minimumCollectionItems = 1;
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('MULTIPOINT(%s)', (string) $this);
     }
 
-    public static function fromWkt($wkt, $srid = 0)
+    public static function fromWkt(string $wkt, ?int $srid = 0)
     {
         $wktArgument = Geometry::getWKTArgument($wkt);
 
         return static::fromString($wktArgument, $srid);
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         $matches = [];
         preg_match_all('/\(\s*(\d+\s+\d+)\s*\)/', trim($wktArgument), $matches);

@@ -56,7 +56,7 @@ class GeometryCollection extends Geometry implements IteratorAggregate, ArrayAcc
         return $this->items;
     }
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('GEOMETRYCOLLECTION(%s)', (string) $this);
     }
@@ -68,7 +68,7 @@ class GeometryCollection extends Geometry implements IteratorAggregate, ArrayAcc
         }, $this->items));
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         if (empty($wktArgument)) {
             return new static([]);

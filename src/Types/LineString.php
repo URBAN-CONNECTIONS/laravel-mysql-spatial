@@ -15,19 +15,19 @@ class LineString extends PointCollection
      */
     protected $minimumCollectionItems = 2;
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('LINESTRING(%s)', $this->toPairList());
     }
 
-    public static function fromWkt($wkt, $srid = 0)
+    public static function fromWkt(string $wkt, ?int $srid = 0)
     {
         $wktArgument = Geometry::getWKTArgument($wkt);
 
         return static::fromString($wktArgument, $srid);
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         $pairs = explode(',', trim($wktArgument));
         $points = array_map(function ($pair) {

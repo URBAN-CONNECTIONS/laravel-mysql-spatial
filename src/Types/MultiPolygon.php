@@ -22,7 +22,7 @@ class MultiPolygon extends GeometryCollection
      */
     protected $collectionItemType = Polygon::class;
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('MULTIPOLYGON(%s)', (string) $this);
     }
@@ -34,7 +34,7 @@ class MultiPolygon extends GeometryCollection
         }, $this->items));
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         $parts = preg_split('/(\)\s*\)\s*,\s*\(\s*\()/', $wktArgument, -1, PREG_SPLIT_DELIM_CAPTURE);
         $polygons = static::assembleParts($parts);

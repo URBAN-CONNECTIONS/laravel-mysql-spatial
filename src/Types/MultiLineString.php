@@ -27,12 +27,12 @@ class MultiLineString extends GeometryCollection
         return $this->items;
     }
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('MULTILINESTRING(%s)', (string) $this);
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         $str = preg_split('/\)\s*,\s*\(/', substr(trim($wktArgument), 1, -1));
         $lineStrings = array_map(function ($data) {

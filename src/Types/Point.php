@@ -52,12 +52,12 @@ class Point extends Geometry
         return new static((float) $lat, (float) $lng, (int) $srid);
     }
 
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('POINT(%s)', (string) $this);
     }
 
-    public static function fromString($wktArgument, $srid = 0)
+    public static function fromString(string $wktArgument, ?int $srid = 0)
     {
         return static::fromPair($wktArgument, $srid);
     }

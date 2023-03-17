@@ -8,7 +8,7 @@ use Grimzy\LaravelMysqlSpatial\Exceptions\InvalidGeoJsonException;
 
 class Polygon extends MultiLineString
 {
-    public function toWKT()
+    public function toWKT(): string
     {
         return sprintf('POLYGON(%s)', (string) $this);
     }
