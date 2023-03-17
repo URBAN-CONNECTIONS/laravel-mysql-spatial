@@ -25,7 +25,7 @@ abstract class Geometry implements GeometryInterface, Jsonable
         'touches',
     ];
 
-    public const ST_ORDER_FUNCTIONS = [
+    public const ST_DISTANCE_FUNCTIONS = [
         'distance',
         'distance_sphere',
     ];
@@ -191,7 +191,7 @@ abstract class Geometry implements GeometryInterface, Jsonable
 
     public function operation(Geometry $other, string $operation): mixed
     {
-        if (!in_array($operation, static::ST_ORDER_FUNCTIONS) && !in_array($operation, static::ST_RELATIONS)) {
+        if (!in_array($operation, static::ST_DISTANCE_FUNCTIONS) && !in_array($operation, static::ST_RELATIONS)) {
             throw new UnknownSpatialFunctionException($operation);
         }
 

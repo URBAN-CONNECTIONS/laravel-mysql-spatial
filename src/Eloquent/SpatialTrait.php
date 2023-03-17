@@ -7,27 +7,28 @@ use Grimzy\LaravelMysqlSpatial\Exceptions\UnknownSpatialFunctionException;
 use Grimzy\LaravelMysqlSpatial\Exceptions\UnknownSpatialRelationFunction;
 use Grimzy\LaravelMysqlSpatial\Types\Geometry;
 use Grimzy\LaravelMysqlSpatial\Types\GeometryInterface;
+use Grimzy\LaravelMysqlSpatial\Types\Polygon;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 /**
  * Trait SpatialTrait.
  *
- * @method static distance($geometryColumn, $geometry, $distance)
- * @method static distanceExcludingSelf($geometryColumn, $geometry, $distance)
- * @method static distanceSphere($geometryColumn, $geometry, $distance)
- * @method static distanceSphereExcludingSelf($geometryColumn, $geometry, $distance)
- * @method static comparison($geometryColumn, $geometry, $relationship)
- * @method static within($geometryColumn, $polygon)
- * @method static crosses($geometryColumn, $geometry)
- * @method static contains($geometryColumn, $geometry)
- * @method static disjoint($geometryColumn, $geometry)
- * @method static equals($geometryColumn, $geometry)
- * @method static intersects($geometryColumn, $geometry)
- * @method static overlaps($geometryColumn, $geometry)
- * @method static doesTouch($geometryColumn, $geometry)
- * @method static orderBySpatial($geometryColumn, $geometry, $orderFunction, $direction = 'asc')
- * @method static orderByDistance($geometryColumn, $geometry, $direction = 'asc')
- * @method static orderByDistanceSphere($geometryColumn, $geometry, $direction = 'asc')
+ * @method static distance(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, float|int $distance)
+ * @method static distanceExcludingSelf(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, float|int $distance)
+ * @method static distanceSphere(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, float|int $distance)
+ * @method static distanceSphereExcludingSelf(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, float|int $distance)
+ * @method static comparison(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, string $relationship)
+ * @method static within(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Polygon $polygon)
+ * @method static crosses(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static contains(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static disjoint(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static equals(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static intersects(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static overlaps(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static doesTouch(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry)
+ * @method static orderBySpatial(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, string $orderFunction, string $direction = 'asc')
+ * @method static orderByDistance(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, string $direction = 'asc')
+ * @method static orderByDistanceSphere(string $geometryColumn, \Grimzy\LaravelMysqlSpatial\Types\Geometry $geometry, string $direction = 'asc')
  */
 trait SpatialTrait
 {
@@ -41,22 +42,6 @@ trait SpatialTrait
      */
 
     public $geometries = [];
-
-    protected $stRelations = [
-        'within',
-        'crosses',
-        'contains',
-        'disjoint',
-        'equals',
-        'intersects',
-        'overlaps',
-        'touches',
-    ];
-
-    protected $stOrderFunctions = [
-        'distance',
-        'distance_sphere',
-    ];
 
     /**
      * Create a new Eloquent query builder for the model.
@@ -99,7 +84,7 @@ trait SpatialTrait
         return $insert; //Return the result of the parent insert
     }
 
-    public function setRawAttributes(array $attributes, $sync = false)
+    public function setRawAttributes(array $attributes, bool $sync = false)
     {
         $spatial_fields = $this->getSpatialFields();
 
@@ -121,7 +106,7 @@ trait SpatialTrait
         }
     }
 
-    public function isColumnAllowed($geometryColumn)
+    public function isColumnAllowed(string $geometryColumn)
     {
         if (!in_array($geometryColumn, $this->getSpatialFields())) {
             throw new SpatialFieldsNotDefinedException();
@@ -130,7 +115,7 @@ trait SpatialTrait
         return true;
     }
 
-    public function scopeDistance($query, $geometryColumn, $geometry, $distance)
+    public function scopeDistance(Builder $query, string $geometryColumn, Geometry $geometry, float|int $distance): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -143,7 +128,7 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeDistanceExcludingSelf($query, $geometryColumn, $geometry, $distance)
+    public function scopeDistanceExcludingSelf(Builder $query, string $geometryColumn, Geometry $geometry, float|int $distance): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -157,7 +142,7 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeDistanceValue($query, $geometryColumn, $geometry)
+    public function scopeDistanceValue(Builder $query, string $geometryColumn, Geometry $geometry, string $name = 'distance', bool $withPrefix = true): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -167,13 +152,17 @@ trait SpatialTrait
             $query->select('*');
         }
 
-        $query->selectRaw("st_distance(`$geometryColumn`, ST_GeomFromText(?, ?)) as distance", [
+        if ($withPrefix) {
+            $name = $geometryColumn . '_' . $name;
+        }
+
+        return $query->selectRaw("st_distance(`$geometryColumn`, ST_GeomFromText(?, ?)) as $name", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
     }
 
-    public function scopeDistanceSphere($query, $geometryColumn, $geometry, $distance)
+    public function scopeDistanceSphere(Builder $query, string $geometryColumn, Geometry $geometry, float|int $distance): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -186,7 +175,7 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeDistanceSphereExcludingSelf($query, $geometryColumn, $geometry, $distance)
+    public function scopeDistanceSphereExcludingSelf(Builder $query, string $geometryColumn, Geometry $geometry, float|int $distance): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -200,7 +189,7 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeDistanceSphereValue($query, $geometryColumn, $geometry)
+    public function scopeDistanceSphereValue(Builder $query, string $geometryColumn, Geometry $geometry, string $name = 'distance', bool $withPrefix = true): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
@@ -209,17 +198,22 @@ trait SpatialTrait
         if (!$columns) {
             $query->select('*');
         }
-        $query->selectRaw("st_distance_sphere(`$geometryColumn`, ST_GeomFromText(?, ?)) as distance", [
+
+        if ($withPrefix) {
+            $name = $geometryColumn . '_' . $name;
+        }
+
+        return $query->selectRaw("st_distance_sphere(`$geometryColumn`, ST_GeomFromText(?, ?)) as $name", [
             $geometry->toWkt(),
             $geometry->getSrid(),
         ]);
     }
 
-    public function scopeComparison($query, $geometryColumn, $geometry, $relationship)
+    public function scopeComparison(Builder $query, string $geometryColumn, Geometry $geometry, string $relationship): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
-        if (!in_array($relationship, $this->stRelations)) {
+        if (!in_array($relationship, Geometry::ST_RELATIONS)) {
             throw new UnknownSpatialRelationFunction($relationship);
         }
 
@@ -231,51 +225,51 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeWithin($query, $geometryColumn, $polygon)
+    public function scopeWithin(Builder $query, string $geometryColumn, Polygon $polygon): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $polygon, 'within');
     }
 
-    public function scopeCrosses($query, $geometryColumn, $geometry)
+    public function scopeCrosses(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'crosses');
     }
 
-    public function scopeContains($query, $geometryColumn, $geometry)
+    public function scopeContains(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'contains');
     }
 
-    public function scopeDisjoint($query, $geometryColumn, $geometry)
+    public function scopeDisjoint(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'disjoint');
     }
 
-    public function scopeEquals($query, $geometryColumn, $geometry)
+    public function scopeEquals(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'equals');
     }
 
-    public function scopeIntersects($query, $geometryColumn, $geometry)
+    public function scopeIntersects(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'intersects');
     }
 
-    public function scopeOverlaps($query, $geometryColumn, $geometry)
+    public function scopeOverlaps(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'overlaps');
     }
 
-    public function scopeDoesTouch($query, $geometryColumn, $geometry)
+    public function scopeDoesTouch(Builder $query, string $geometryColumn, Geometry $geometry): Builder
     {
         return $this->scopeComparison($query, $geometryColumn, $geometry, 'touches');
     }
 
-    public function scopeOrderBySpatial($query, $geometryColumn, $geometry, $orderFunction, $direction = 'asc')
+    public function scopeOrderBySpatial(Builder $query, string $geometryColumn, Geometry $geometry, string $orderFunction, string $direction = 'asc'): Builder
     {
         $this->isColumnAllowed($geometryColumn);
 
-        if (!in_array($orderFunction, $this->stOrderFunctions)) {
+        if (!in_array($orderFunction, Geometry::ST_DISTANCE_FUNCTIONS)) {
             throw new UnknownSpatialFunctionException($orderFunction);
         }
 
@@ -287,12 +281,12 @@ trait SpatialTrait
         return $query;
     }
 
-    public function scopeOrderByDistance($query, $geometryColumn, $geometry, $direction = 'asc')
+    public function scopeOrderByDistance(Builder $query, string $geometryColumn, Geometry $geometry, string $direction = 'asc'): Builder
     {
         return $this->scopeOrderBySpatial($query, $geometryColumn, $geometry, 'distance', $direction);
     }
 
-    public function scopeOrderByDistanceSphere($query, $geometryColumn, $geometry, $direction = 'asc')
+    public function scopeOrderByDistanceSphere(Builder $query, string $geometryColumn, Geometry $geometry, string $direction = 'asc'): Builder
     {
         return $this->scopeOrderBySpatial($query, $geometryColumn, $geometry, 'distance_sphere', $direction);
     }
