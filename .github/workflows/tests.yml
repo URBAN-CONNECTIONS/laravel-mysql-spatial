@@ -30,7 +30,6 @@ jobs:
       - uses: shogo82148/actions-setup-mysql@v1
         with:
           distribution: ${{ matrix.database }}
-          database: spatial_test
 
       - name: Install dependencies
         run: composer install
