@@ -47,6 +47,11 @@ abstract class Geometry implements GeometryInterface, Jsonable
         $this->srid = (int) $srid;
     }
 
+    public static function make(): static
+    {
+        return new static(...func_get_args());
+    }
+
     public function getSrid()
     {
         return $this->srid;

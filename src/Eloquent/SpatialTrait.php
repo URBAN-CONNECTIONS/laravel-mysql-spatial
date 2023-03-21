@@ -84,7 +84,7 @@ trait SpatialTrait
         return $insert; //Return the result of the parent insert
     }
 
-    public function setRawAttributes(array $attributes, bool $sync = false)
+    public function setRawAttributes(array $attributes, $sync = false)
     {
         $spatial_fields = $this->getSpatialFields();
 
