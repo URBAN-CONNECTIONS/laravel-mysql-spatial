@@ -42,7 +42,10 @@ class Point extends Geometry
 
     public function toPair()
     {
-        return $this->getLng() . ' ' . $this->getLat();
+        return match ($this->getSrid()) {
+            4326 => $this->lat . ' ' . $this->lng,
+            default => $this->lng . ' ' . $this->lat,
+        };
     }
 
     public static function fromPair($pair, $srid = 0)
@@ -64,7 +67,7 @@ class Point extends Geometry
 
     public function __toString()
     {
-        return $this->getLng() . ' ' . $this->getLat();
+        return $this->toPair();
     }
 
     /**
