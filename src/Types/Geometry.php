@@ -218,9 +218,15 @@ abstract class Geometry implements GeometryInterface, Jsonable
         return $result[0]->result;
     }
 
-    public function dimension(): float
+    /**
+     * −1 for an empty geometry.
+     *  0 for a geometry with no length and no area.
+     *  1 for a geometry with nonzero length and zero area.
+     *  2 for a geometry with nonzero area. 
+     */
+    public function dimension(): int
     {
-        return (float)$this->operation(__FUNCTION__);
+        return (int)$this->operation(__FUNCTION__);
     }
 
     public function envelope(): Geometry
