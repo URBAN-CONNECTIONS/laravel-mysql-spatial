@@ -15,11 +15,13 @@ class LineString extends PointCollection
      */
     protected $minimumCollectionItems = 2;
 
-    public function close()
+    public function close(): static
     {
         if ($this->isNotEmpty() && $this->items[0] != $this->items[$this->count() - 1]) {
             $this->items[] = clone $this->items[0];
         }
+
+        return $this;
     }
 
     public function length(): float
