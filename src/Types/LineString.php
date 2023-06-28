@@ -15,6 +15,18 @@ class LineString extends PointCollection
      */
     protected $minimumCollectionItems = 2;
 
+    public function close()
+    {
+        if ($this->isNotEmpty() && $this->items[0] != $this->items[$this->count() - 1]) {
+            $this->items[] = clone $this->items[0];
+        }
+    }
+
+    public function length(): float
+    {
+        return (float)$this->operation(__FUNCTION__);
+    }
+
     public function toWKT(): string
     {
         return sprintf('LINESTRING(%s)', $this->toPairList());

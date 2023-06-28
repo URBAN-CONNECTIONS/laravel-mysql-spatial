@@ -30,6 +30,14 @@ abstract class Geometry implements GeometryInterface, Jsonable
         'distance_sphere',
     ];
 
+    public const ST_GEOMETRY_FUNCTIONS = [
+        'dimension',
+        'envelop',
+        'length',
+        'area',
+        'centroid',
+    ];
+
     protected static $wkb_types = [
         1 => Point::class,
         2 => LineString::class,
@@ -146,55 +154,55 @@ abstract class Geometry implements GeometryInterface, Jsonable
 
     public function distance(Geometry $other): float
     {
-        return (float)$this->operation($other, 'distance');
+        return (float)$this->comparisonOperation($other, 'distance');
     }
 
     public function sphereDistance(Geometry $other): float
     {
-        return (float)$this->operation($other, 'distance_sphere');
+        return (float)$this->comparisonOperation($other, 'distance_sphere');
     }
 
     public function within(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function crosses(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function contains(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function disjoint(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function equals(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function intersects(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function overlaps(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
     public function touches(Geometry $other): bool
     {
-        return (bool)$this->operation($other, __FUNCTION__);
+        return (bool)$this->comparisonOperation($other, __FUNCTION__);
     }
 
-    public function operation(Geometry $other, string $operation): mixed
+    public function comparisonOperation(Geometry $other, string $operation): mixed
     {
         if (!in_array($operation, static::ST_DISTANCE_FUNCTIONS) && !in_array($operation, static::ST_RELATIONS)) {
             throw new UnknownSpatialFunctionException($operation);
@@ -205,6 +213,30 @@ abstract class Geometry implements GeometryInterface, Jsonable
             $this->getSrid(),
             $other->toWKT(),
             $other->getSrid(),
+        ]);
+
+        return $result[0]->result;
+    }
+
+    public function dimension(): float
+    {
+        return (float)$this->operation(__FUNCTION__);
+    }
+
+    public function envelop(): Geometry
+    {
+        return Geometry::fromWKB($this->operation(__FUNCTION__));
+    }
+
+    public function operation(string $operation): mixed
+    {
+        if (!in_array($operation, static::ST_GEOMETRY_FUNCTIONS)) {
+            throw new UnknownSpatialFunctionException($operation);
+        }
+
+        $result = DB::select("select st_{$operation}(ST_GeomFromText(?, ?)) as result", [
+            $this->toWKT(),
+            $this->getSrid(),
         ]);
 
         return $result[0]->result;

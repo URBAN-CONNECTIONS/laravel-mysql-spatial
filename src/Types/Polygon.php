@@ -5,9 +5,32 @@ namespace Grimzy\LaravelMysqlSpatial\Types;
 use GeoJson\GeoJson;
 use GeoJson\Geometry\Polygon as GeoJsonPolygon;
 use Grimzy\LaravelMysqlSpatial\Exceptions\InvalidGeoJsonException;
+use Grimzy\LaravelMysqlSpatial\Types\Concerns\PolygonFunctions;
+use InvalidArgumentException;
 
 class Polygon extends MultiLineString
 {
+    use PolygonFunctions;
+
+    public function exteriorRing(): ?LineString
+    {
+        return $this->items[0] ?? null;
+    }
+
+    public function interiorRing(int $i = 0): ?LineString
+    {
+        if ($i < 0) {
+            throw new InvalidArgumentException('Argument must be greater or equal than 0.');
+        }
+
+        return $this->items[$i + 1] ?? null;
+    }
+
+    public function interiorRingCount(): int
+    {
+        return max($this->count() - 1, 0);
+    }
+
     public function toWKT(): string
     {
         return sprintf('POLYGON(%s)', (string) $this);

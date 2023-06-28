@@ -56,6 +56,16 @@ class GeometryCollection extends Geometry implements IteratorAggregate, ArrayAcc
         return $this->items;
     }
 
+    public function isNotEmpty(): bool
+    {
+        return $this->count() > 0;
+    }
+
+    public function isEmpty(): bool
+    {
+        return !$this->isNotEmpty();
+    }
+
     public function toWKT(): string
     {
         return sprintf('GEOMETRYCOLLECTION(%s)', (string) $this);

@@ -27,6 +27,11 @@ class MultiLineString extends GeometryCollection
         return $this->items;
     }
 
+    public function length(): float
+    {
+        return (float)$this->operation(__FUNCTION__);
+    }
+
     public function toWKT(): string
     {
         return sprintf('MULTILINESTRING(%s)', (string) $this);
