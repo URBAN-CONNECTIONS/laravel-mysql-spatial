@@ -32,7 +32,7 @@ abstract class Geometry implements GeometryInterface, Jsonable
 
     public const ST_GEOMETRY_FUNCTIONS = [
         'dimension',
-        'envelop',
+        'envelope',
         'length',
         'area',
         'centroid',
@@ -223,7 +223,7 @@ abstract class Geometry implements GeometryInterface, Jsonable
         return (float)$this->operation(__FUNCTION__);
     }
 
-    public function envelop(): Geometry
+    public function envelope(): Geometry
     {
         return Geometry::fromWKB($this->operation(__FUNCTION__));
     }
